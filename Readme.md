@@ -1,7 +1,7 @@
 # Личный проект «Код и Магия» [![Build status][travis-image]][travis-url] [![Dependency status][dependency-image]][dependency-url]
 
 * Студент: [Александр Драюк](https://up.htmlacademy.ru/javascript/4/user/8344).
-* Наставник: `Неизвестно`.
+* Наставник: [Александр Духовняк](https://htmlacademy.ru/profile/id126025).
 
 ---
 

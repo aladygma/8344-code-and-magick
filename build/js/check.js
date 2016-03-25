@@ -1,3 +1,4 @@
+// Здравствуй Александр!
 function getMessage(a, b) {
   if (typeof a == "boolean") {
 
@@ -12,7 +13,7 @@ function getMessage(a, b) {
 
   } else if (typeof a == "object") {
     var sum = 0;
-
+  // Може разумнее было написать отдельную функцию для подсчета элементов в массиве?
     for (var i = 0; i < a.length; i++) {
       sum += a[i];
     }

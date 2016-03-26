@@ -1,33 +1,52 @@
-// Здравствуй Александр!
 function getMessage(a, b) {
-  if (typeof a == "boolean") {
+  var aType = typeof a;
 
-    if (a) {
-      return "Я попал в " + b;
-    } else {
-      return "Я никуда не попал";
-    }
+  switch (aType) {
+    case "boolean":
 
-  } else if (typeof a == "number") {
-    return "Я прыгнул на " + a * 100 + " сантиметров";
+      if (a) {
+        return "Я попал в " + b;
+      } else {
+        return "Я никуда не попал";
+      }
 
-  } else if ((typeof a == "object") && (typeof b == "object") ) {
-    var length = 0;
+      break;
 
-    for (var i = 0; i < a.length; i++) {
-      length += a[i] * b[i];
-    }
+    case "number":
+      return "Я прыгнул на " + a * 100 + " сантиметров";
+      break;
+// Саша, мне не нравится следующий участок кода.
+// Пожалуйста подскажи, если можно его улучшить
 
-    return "Я прошел " + length + " метров";
+    case "object":
+      var aArray = Array.isArray(a);
+      var bArray = Array.isArray(b);
 
-  } else if (typeof a == "object") {
-    var sum = 0;
-  // Може разумнее было написать отдельную функцию для подсчета элементов в массиве?
-    for (var i = 0; i < a.length; i++) {
-      sum += a[i];
-    }
+      if (aArray && bArray) {
+        var length = 0;
 
-    return "Я прошел " + sum + " шагов";
+        for (var i = 0; i < a.length; i++) {
+          length += a[i] * b[i];
+        }
+
+        return "Я прошёл " + length + " метров";
+
+      } else if (aArray) {
+        var sum = 0;
+
+        var sum = a.reduce(function(total, current) {
+          return total + current;
+        }, 0);
+
+        return "Я прошёл " + sum + " шагов";
+
+        } else {
+          return "Я сделал что-то странное"
+        }
+
+      break;
+
+    default:
+      alert("Я сделал что-то странное");
   }
-
 }

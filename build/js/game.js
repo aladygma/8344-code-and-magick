@@ -378,19 +378,94 @@
      * Отрисовка экрана паузы.
      */
     _drawPauseScreen: function() {
+      var ctx = this.canvas.getContext('2d');
       switch (this.state.currentStatus) {
         case Verdict.WIN:
-          console.log('you have won!');
+          drawMessage(250,
+            'Я научился стрелять! Теперь меня точно возьмут в армию!');
           break;
         case Verdict.FAIL:
-          console.log('you have failed!');
+          drawMessage(250, 'Именно так погиб мой и мой дедушка');
           break;
         case Verdict.PAUSE:
-          console.log('game is on pause!');
+          drawMessage(250,
+            'Перед вами экран паузы. Это самый крутой экран паузы который \n' +
+            'вы могли видеть в своей жизни. Это вообще самый паузный экран паузы!');
           break;
         case Verdict.INTRO:
-          console.log('welcome to the game! Press Space to start');
+          drawMessage(250,
+            'Ну наконец-то у меня нормальный наставник. \n' +
+            'Тепер я стану настоящим Frontend-разработчиком!');
           break;
+      }
+      // Отрисовка окна с сообщением
+      function drawMessage(messageWidth, text) {
+        var MESSAGE_AREA_COLOR = '#ffffff';
+        var TEXT_COLOR = '#000000';
+        var SHADOW_COLOR = 'rgba(0, 0, 0, 0.7)';
+        var SHADOW_SHIFT = 5;
+        var FONT_SIZE = 16;
+        var FONT_FAMILY = 'PT Mono';
+        var MARGIN = 10;
+        var lineHeight = FONT_SIZE * 1.32;
+        //Центровка сообщения по середине области
+        var messageX = (WIDTH - messageWidth) / 2;
+        //Собираем текст в массив слов
+        var words = text.split(' ');
+        //Максимальная высота окна сообщения
+        //будет вычисляться автоматически
+        var messageHeight = 0;
+        //Максимальная ширина отдельной строки
+        var maxWidth = messageWidth - MARGIN;
+        //Инициализация счетчика для массива строк
+        var lineCount = 0;
+        //Массив строк
+        var lines = [];
+        //Инициализация элемента для массива строк
+        var newLine = '';
+        //А это тестовая строка,
+        //с ее помощью мы будем проверять максимальную длину строки
+        var testLine = '';
+
+        //Формируем массив строк
+        ctx.font = FONT_SIZE + 'px' + ' ' + FONT_FAMILY;
+
+        for (var i = 0; i < words.length; i++) {
+          newLine += words[i] + ' ';
+          //Проверка на то, влезет ли строка в сообщение
+          //если добавит к ней еще одно слово
+          testLine = newLine + words[i + 1] + ' ';
+
+          if ((ctx.measureText(testLine).width > maxWidth) || words[i + 1] === undefined) {
+            lines[lineCount] = newLine;
+            newLine = '';
+            lineCount++;
+          }
+        }
+
+        //Максимальная высота текстовой области
+        messageHeight = lines.length * lineHeight + MARGIN;
+        //Центровка сообщения по вертикали
+        var messageY = HEIGHT - 90 - messageHeight;
+        //Отрисовка тени
+        ctx.fillStyle = SHADOW_COLOR;
+        ctx.fillRect(messageX + SHADOW_SHIFT, messageY + SHADOW_SHIFT,
+                         messageWidth, messageHeight);
+        //Отрисовка текстовой подложки
+        ctx.fillStyle = MESSAGE_AREA_COLOR;
+        ctx.fillRect(messageX, messageY, messageWidth, messageHeight);
+        //Задание стилей для текста
+        ctx.fillStyle = TEXT_COLOR;
+        ctx.textBaseline = 'top';
+        ctx.font = FONT_SIZE + 'px' + ' ' + FONT_FAMILY;
+        //Выводим текст в цикле
+        var textX = MARGIN / 2 + messageX;
+        var textY = MARGIN / 2 + messageY;
+
+        for (var i = 0; i < lines.length; i++) {
+          ctx.fillText(lines[i], textX, textY);
+          textY += lineHeight;
+        }
       }
     },
 

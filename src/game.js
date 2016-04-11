@@ -427,16 +427,17 @@
         //с ее помощью мы будем проверять максимальную длину строки
         var testLine = '';
 
+        var i = null;
         //Формируем массив строк
         ctx.font = FONT_SIZE + 'px' + ' ' + FONT_FAMILY;
 
-        for (var i = 0; i < words.length; i++) {
+        for (i = 0; i < words.length; i++) {
           newLine += words[i] + ' ';
           //Проверка на то, влезет ли строка в сообщение
           //если добавит к ней еще одно слово
           testLine = newLine + words[i + 1] + ' ';
 
-          if ((ctx.measureText(testLine).width > maxWidth) || words[i + 1] === undefined) {
+          if ((ctx.measureText(testLine).width > maxWidth) || words[i + 1] === void 0) {
             lines[lineCount] = newLine;
             newLine = '';
             lineCount++;
@@ -462,7 +463,7 @@
         var textX = MARGIN / 2 + messageX;
         var textY = MARGIN / 2 + messageY;
 
-        for (var i = 0; i < lines.length; i++) {
+        for (i = 0; i < lines.length; i++) {
           ctx.fillText(lines[i], textX, textY);
           textY += lineHeight;
         }

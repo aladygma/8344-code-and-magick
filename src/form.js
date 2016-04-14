@@ -2,6 +2,8 @@
 
 (function() {
   var MIN_MARK = 3;
+  var isDisabled = false;
+  var isEnabled = true;
   var formContainer = document.querySelector('.overlay-container');
   var formOpenButton = document.querySelector('.reviews-controls-new');
   var formCloseButton = document.querySelector('.review-form-close');
@@ -13,20 +15,19 @@
 
 
   function getMark() {
-    var reviewMark = document.querySelector('[name=review-mark]:checked');
-    return +reviewMark.value;
+    return Number(document.querySelector('[name=review-mark]:checked').value);
   }
 
   function getName() {
     formNameInput = document.querySelector('#review-name');
     //Удаляем лишние пробелы
-    var name = formNameInput.value.replace(/(^\s+|\s+$)/g, '');
+    var name = formNameInput.value.replace(/\s+/g, '');
 
     if (name) {
-      formNameIndicator.style.visibility = 'hidden';
+      formNameIndicator.classList.add('invisible');
     } else {
-      formNameIndicator.style.visibility = 'visible';
-      formSubmitButton.setAttribute('disabled', true);
+      formNameIndicator.classList.remove('invisible');
+      formSubmitButton.disabled = isDisabled;
     }
 
     return name;
@@ -35,31 +36,29 @@
   function getReviewText() {
     formReviewText = document.querySelector('#review-text');
     //Удаляем лишние пробелы
-    var reviewText = formReviewText.value.replace(/(^\s+|\s+$)/g, '');
+    var reviewText = formReviewText.value.replace(/\s+/g, '');
 
     if (reviewText) {
-      formTextIndicator.style.visibility = 'hidden';
-      formSubmitButton.removeAttribute('disabled');
+      formTextIndicator.classList.add('invisible');
+      formSubmitButton.disabled = isDisabled;
     } else {
-      formTextIndicator.style.visibility = 'visible';
-      formSubmitButton.setAttribute('disabled', true);
+      formTextIndicator.classList.remove('invisible');
+      formSubmitButton.disabled = isEnabled;
     }
   }
 
-  //По умолчанию кнопка деактивирована
-  formSubmitButton.setAttribute('disabled', true);
 
+  formNameInput.oninput = function() {
 
-  formNameInput.oninput = function(evt) {
-    evt.preventDefault();
-    var mark = getMark();
+    formNameIndicator.classList.add('invisible');
 
-    if (mark < MIN_MARK) {
-      formReviewText.setAttribute('required', true);
+    if(getMark() >= MIN_MARK) {
+      formReviewText.required = isDisabled;
+      formSubmitButton.disabled = isDisabled;
+      formTextIndicator.classList.add('invisible');
     } else {
-      formReviewText.removeAttribute('required');
-      formSubmitButton.removeAttribute('disabled');
-      formTextIndicator.style.visibility = 'hidden';
+      formTextIndicator.classList.remove('invisible');
+      formSubmitButton.disabled = isEnabled;
     }
 
     getName();

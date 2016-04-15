@@ -12,7 +12,8 @@
   var formNameIndicator = document.querySelector('.review-fields-name');
   var formTextIndicator = document.querySelector('.review-fields-text');
   var formSubmitButton = document.querySelector('.review-submit');
-
+  var reviewMarks = document.querySelectorAll('input[name=review-mark]');
+  var reviewFields = document.querySelector('.review-fields');
 
   function getMark() {
     return Number(document.querySelector('[name=review-mark]:checked').value);
@@ -21,54 +22,52 @@
   function getName() {
     formNameInput = document.querySelector('#review-name');
     //Удаляем лишние пробелы
-    var name = formNameInput.value.replace(/\s+/g, '');
-
-    if (name) {
-      formNameIndicator.classList.add('invisible');
-    } else {
-      formNameIndicator.classList.remove('invisible');
-      formSubmitButton.disabled = isDisabled;
-    }
-
-    return name;
+    return formNameInput.value.replace(/\s+/g, '');
   }
 
   function getReviewText() {
     formReviewText = document.querySelector('#review-text');
     //Удаляем лишние пробелы
-    var reviewText = formReviewText.value.replace(/\s+/g, '');
+    return formReviewText.value.replace(/\s+/g, '');
+  }
 
-    if (reviewText) {
+  function checkSubmitButton() {
+    //Чтобы не делать вложенные If, каждый раз при вызове
+    //функции добавляем эти классы, а потом уже идет проверка
+    formNameIndicator.classList.remove('invisible');
+    formTextIndicator.classList.remove('invisible');
+
+    if(getMark() >= MIN_MARK) {
       formTextIndicator.classList.add('invisible');
+    }
+    if (getName() !== '') {
+      formNameIndicator.classList.add('invisible');
+    }
+    if (getReviewText() !== '') {
+      formTextIndicator.classList.add('invisible');
+    }
+    if (formNameIndicator.classList.contains('invisible') &&
+        formTextIndicator.classList.contains('invisible')) {
       formSubmitButton.disabled = isDisabled;
+      reviewFields.classList.add('invisible');
     } else {
-      formTextIndicator.classList.remove('invisible');
       formSubmitButton.disabled = isEnabled;
+      reviewFields.classList.remove('invisible');
     }
   }
 
+  for (var i = 0; i < reviewMarks.length; i++) {
+    reviewMarks[i].onchange = checkSubmitButton;
+  }
 
-  formNameInput.oninput = function() {
+  //Это чтобы при загрузке формы убрать указатель
+  //для поля 'отзыв'
+  if (getMark() === MIN_MARK) {
+    formTextIndicator.classList.add('invisible');
+  }
 
-    formNameIndicator.classList.add('invisible');
-
-    if(getMark() >= MIN_MARK) {
-      formReviewText.required = isDisabled;
-      formSubmitButton.disabled = isDisabled;
-      formTextIndicator.classList.add('invisible');
-    } else {
-      formTextIndicator.classList.remove('invisible');
-      formSubmitButton.disabled = isEnabled;
-    }
-
-    getName();
-
-  };
-
-  formReviewText.oninput = function(evt) {
-    evt.preventDefault();
-    getReviewText();
-  };
+  formNameInput.oninput = checkSubmitButton;
+  formReviewText.oninput = checkSubmitButton;
 
   formOpenButton.onclick = function(evt) {
     evt.preventDefault();

@@ -1,8 +1,13 @@
-IMAGE_TIMEOUT_TIME = 10000;
+/* global reviews */
+'use strict';
+
+var IMAGE_TIMEOUT_TIME = 10000;
 
 var reviewTemplate = document.querySelector('#review-template');
 var reviewContainer = document.querySelector('.reviews-list');
 var elementToClone;
+
+document.querySelector('.reviews-filter').classList.add('invisible');
 
 if('content' in reviewTemplate) {
   elementToClone = reviewTemplate.content.querySelector('.review');
@@ -32,18 +37,11 @@ function getReviewElement(data, container) {
 
   authorAvatar.src = data.author.picture;
   reviewElement.querySelector('.review-text').textContent = data.description;
+  container.appendChild(reviewElement);
 
   return reviewElement;
-};
-
-var reviews = [];
-
-  function __reviewsLoadCallback(data) {
-    reviews = data;
-    console.log(data);
-  };
+}
 
 reviews.forEach(function(review) {
   getReviewElement(review, reviewContainer);
 });
-

@@ -15,23 +15,72 @@
   var IMAGE_TIMEOUT_TIME = 10000;
   var BAD_RATING = 2;
   var GOOD_RATING = 3;
+  var PAGE_SIZE = 3;
   //Миллисекунд в 2 неделях
   var RECENT_REVIEWS_TIME = 1000 * 3600 * 24;
 
+  var showMoreReviews = document.querySelector('.reviews-controls-more');
   var templateTag = document.querySelector('#review-template');
   var reviewsList = document.querySelector('.reviews-list');
   var reviewsFilter = document.querySelector('.reviews-filter');
   var reviewsSection = document.querySelector('.reviews');
-  var filterToggles = document.getElementsByName('reviews');
   var reviewsErrorClass = 'reviews-load-failure';
+  var pageNumber = 0;
   var cloneElement;
   var rawData = [];
+  var currentFilteredReviews = [];
 
   if ('content' in templateTag) {
     cloneElement = templateTag.content.querySelector('.review');
   } else {
     cloneElement = templateTag.querySelector('.review');
   }
+
+  reviewsFilter.classList.add('invisible');
+  //Здесь я устанавливаю прелоадер
+  reviewsSection.classList.add('reviews-list-loading');
+
+  var xhr = new XMLHttpRequest();
+
+  xhr.onload = function(evt) {
+    reviewsFilter.classList.remove('invisible');
+    //Выключаю прелоадер
+    reviewsSection.classList.remove('reviews-list-loading');
+    cloneElement.querySelector('.review-rating').classList.add('invisible');
+
+    //Вывод отзывов по умолчанию
+    rawData = JSON.parse(evt.target.response);
+    currentFilteredReviews = getFilteredReviews(rawData, DEFAULT_FILTER);
+    renderReviews(currentFilteredReviews);
+  };
+
+  xhr.onerror = function() {
+    reviewsSection.classList.add(reviewsErrorClass);
+  };
+
+  xhr.timeout = REQUEST_TIMEOUT;
+  xhr.ontimeout = function() {
+    reviewsSection.classList.add(reviewsErrorClass);
+  };
+
+  xhr.open('GET', REQUEST_URL);
+  xhr.send();
+
+  //Установка обработчика на кнопку 'Еще отзывы'
+  showMoreReviews.addEventListener('click', function() {
+    renderReviews(currentFilteredReviews);
+  } );
+
+  //Установка обработчика на кнопки фильтров
+  reviewsFilter.addEventListener('click', function(evt) {
+    if (evt.target.name === 'reviews') {
+      pageNumber = 0;
+      currentFilteredReviews = getFilteredReviews(rawData, evt.target.id);
+      renderReviews(currentFilteredReviews);
+    }
+
+  });
+
 
   function getFilteredReviews(data, filterType) {
     var unfilteredReviews = data.slice(0);
@@ -117,49 +166,30 @@
     reviewsList.appendChild(reviewContainer);
   }
 
-  function renderReviews(data) {
-    data.forEach( function(review) {
+  function renderReviews(filteredReviews) {
+    var from = pageNumber * PAGE_SIZE;
+    var to = from + PAGE_SIZE;
+
+    if (!pageNumber) {
+      reviewsList.innerHTML = '';
+    }
+
+
+    filteredReviews.slice(from, to).forEach( function(review) {
       getOneReview(review);
-    });
+    } );
+
+    pageNumber++;
+
+    if ( isNextPageAvailable() ) {
+      showMoreReviews.classList.remove('invisible');
+    } else {
+      showMoreReviews.classList.add('invisible');
+    }
   }
 
-  function switchFilter(id) {
-    reviewsList.innerHTML = '';
-    renderReviews( getFilteredReviews(rawData, id) );
-  }
-
-  reviewsFilter.classList.add('invisible');
-  //Здесь я устанавливаю прелоадер
-  reviewsSection.classList.add('reviews-list-loading');
-
-  var xhr = new XMLHttpRequest();
-
-  xhr.onload = function(evt) {
-    reviewsFilter.classList.remove('invisible');
-    //Выключаю прелоадер
-    reviewsSection.classList.remove('reviews-list-loading');
-
-    cloneElement.querySelector('.review-rating').classList.add('invisible');
-    rawData = JSON.parse(evt.target.response);
-    renderReviews( getFilteredReviews(rawData, DEFAULT_FILTER));
-  };
-
-  xhr.onerror = function() {
-    reviewsSection.classList.add(reviewsErrorClass);
-  };
-
-  xhr.timeout = REQUEST_TIMEOUT;
-  xhr.ontimeout = function() {
-    reviewsSection.classList.add(reviewsErrorClass);
-  };
-
-  xhr.open('GET', REQUEST_URL);
-  xhr.send();
-
-  for (var i = 0; i < filterToggles.length; i++) {
-    filterToggles[i].onclick = function(evt) {
-      switchFilter(evt.target.id);
-    };
+  function isNextPageAvailable() {
+    return currentFilteredReviews.length - (PAGE_SIZE * pageNumber) > 0;
   }
 
 })();

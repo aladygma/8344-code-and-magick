@@ -766,14 +766,20 @@
 
   var gameBlock = document.querySelector('.demo');
   var headerClouds = document.querySelector('.header-clouds');
-  var tempCloudsCoord = headerClouds.getBoundingClientRect();
+  var tempCloudsYOffset = window.pageYOffset;
   var cloudsScrollStatus = true;
   var scrollStateTimeout;
   var gameStateTimeout;
-
+  var moveCloudsTimeout;
+  //Начальное положение облаков
+  headerClouds.style.left = 0;
   //Устанавливаю обработчики на скролл объекта window
   window.addEventListener('scroll', function() {
-    moveCloudsByScroll();
+    clearTimeout(moveCloudsTimeout);
+
+    moveCloudsTimeout = setTimeout(function() {
+      moveCloudsByScroll();
+    }, 20);
   });
 
   window.addEventListener('scroll', function() {
@@ -795,16 +801,17 @@
   function moveCloudsByScroll() {
     //Переменная tempCloudsCoord нужна для проверки
     //направления прокрутки
-    var cloudsCoords = headerClouds.getBoundingClientRect();
 
-    if (cloudsCoords.bottom < tempCloudsCoord.bottom) {
-      tempCloudsCoord = headerClouds.getBoundingClientRect();
+    if (window.pageYOffset > tempCloudsYOffset) {
+      tempCloudsYOffset = window.pageYOffset;
       moveClouds('left');
+      return;
     }
 
-    if (cloudsCoords.bottom > tempCloudsCoord.bottom) {
-      tempCloudsCoord = headerClouds.getBoundingClientRect();
+    if (window.pageYOffset < tempCloudsYOffset) {
+      tempCloudsYOffset = window.pageYOffset;
       moveClouds('right');
+      return;
     }
   }
 
@@ -812,10 +819,12 @@
     if (cloudsScrollStatus) {
       switch (direction) {
         case 'left':
-          headerClouds.style.left = tempCloudsCoord.left - CLOUDS_MOVE_DISTANCE + 'px';
+          headerClouds.style.left = parseInt(headerClouds.style.left, 10) - CLOUDS_MOVE_DISTANCE + 'px';
+          //console.log('left -' + headerClouds.style.left);
           break;
         case 'right':
-          headerClouds.style.left = tempCloudsCoord.left + CLOUDS_MOVE_DISTANCE + 'px';
+          headerClouds.style.left = parseInt(headerClouds.style.left, 10) + CLOUDS_MOVE_DISTANCE + 'px';
+          //console.log('right -' + headerClouds.style.left);
           break;
       }
     }

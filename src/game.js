@@ -13,6 +13,9 @@
    */
   var WIDTH = 700;
 
+  //Смещение облаков при скролле
+  var CLOUDS_MOVE_DISTANCE = 5;
+
   /**
    * ID уровней.
    * @enum {number}
@@ -760,4 +763,79 @@
   var game = new Game(document.querySelector('.demo'));
   game.initializeLevelAndStart();
   game.setGameStatus(window.Game.Verdict.INTRO);
+
+  var gameBlock = document.querySelector('.demo');
+  var headerClouds = document.querySelector('.header-clouds');
+  var tempCloudsCoord = headerClouds.getBoundingClientRect();
+  var cloudsScrollStatus = true;
+  var scrollStateTimeout;
+  var gameStateTimeout;
+
+  //Устанавливаю обработчики на скролл объекта window
+  window.addEventListener('scroll', function() {
+    moveCloudsByScroll();
+  });
+
+  window.addEventListener('scroll', function() {
+    clearTimeout(scrollStateTimeout);
+
+    scrollStateTimeout = setTimeout(function() {
+      isCloudsScrollEnabled();
+    }, 50);
+  });
+
+  window.addEventListener('scroll', function() {
+    clearTimeout(gameStateTimeout);
+
+    gameStateTimeout = setTimeout(function() {
+      setGameState();
+    }, 50);
+  });
+
+  function moveCloudsByScroll() {
+    //Переменная tempCloudsCoord нужна для проверки
+    //направления прокрутки
+    var cloudsCoords = headerClouds.getBoundingClientRect();
+
+    if (cloudsCoords.bottom < tempCloudsCoord.bottom) {
+      tempCloudsCoord = headerClouds.getBoundingClientRect();
+      moveClouds('left');
+    }
+
+    if (cloudsCoords.bottom > tempCloudsCoord.bottom) {
+      tempCloudsCoord = headerClouds.getBoundingClientRect();
+      moveClouds('right');
+    }
+  }
+
+  function moveClouds(direction) {
+    if (cloudsScrollStatus) {
+      switch (direction) {
+        case 'left':
+          headerClouds.style.left = tempCloudsCoord.left - CLOUDS_MOVE_DISTANCE + 'px';
+          break;
+        case 'right':
+          headerClouds.style.left = tempCloudsCoord.left + CLOUDS_MOVE_DISTANCE + 'px';
+          break;
+      }
+    }
+  }
+
+  function isCloudsScrollEnabled() {
+    //Если блок .demo не виден, то облака не скролятся
+    if (gameBlock.getBoundingClientRect().bottom <= 0) {
+      cloudsScrollStatus = false;
+    } else {
+      cloudsScrollStatus = true;
+    }
+  }
+
+  function setGameState() {
+    if (cloudsScrollStatus === false) {
+      game.setGameStatus(window.Game.Verdict.PAUSE);
+    } else {
+      game.setGameStatus(window.Game.Verdict.CONTINUE);
+    }
+  }
+
 })();

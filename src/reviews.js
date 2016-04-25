@@ -81,7 +81,6 @@
 
   });
 
-
   function getFilteredReviews(data, filterType) {
     var unfilteredReviews = data.slice(0);
     var filteredReviews = [];
@@ -173,7 +172,6 @@
     if (!pageNumber) {
       reviewsList.innerHTML = '';
     }
-
 
     filteredReviews.slice(from, to).forEach( function(review) {
       getOneReview(review);

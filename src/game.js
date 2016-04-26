@@ -13,6 +13,9 @@
    */
   var WIDTH = 700;
 
+  //Смещение облаков при скролле
+  var CLOUDS_MOVE_DISTANCE = 5;
+
   /**
    * ID уровней.
    * @enum {number}
@@ -760,4 +763,88 @@
   var game = new Game(document.querySelector('.demo'));
   game.initializeLevelAndStart();
   game.setGameStatus(window.Game.Verdict.INTRO);
+
+  var gameBlock = document.querySelector('.demo');
+  var headerClouds = document.querySelector('.header-clouds');
+  var tempCloudsYOffset = window.pageYOffset;
+  var cloudsScrollStatus = true;
+  var scrollStateTimeout;
+  var gameStateTimeout;
+  var moveCloudsTimeout;
+  //Начальное положение облаков
+  headerClouds.style.left = 0;
+  //Устанавливаю обработчики на скролл объекта window
+  window.addEventListener('scroll', function() {
+    clearTimeout(moveCloudsTimeout);
+
+    moveCloudsTimeout = setTimeout(function() {
+      moveCloudsByScroll();
+    }, 20);
+  });
+
+  window.addEventListener('scroll', function() {
+    clearTimeout(scrollStateTimeout);
+
+    scrollStateTimeout = setTimeout(function() {
+      isCloudsScrollEnabled();
+    }, 50);
+  });
+
+  window.addEventListener('scroll', function() {
+    clearTimeout(gameStateTimeout);
+
+    gameStateTimeout = setTimeout(function() {
+      setGameState();
+    }, 50);
+  });
+
+  function moveCloudsByScroll() {
+    //Переменная tempCloudsCoord нужна для проверки
+    //направления прокрутки
+
+    if (window.pageYOffset > tempCloudsYOffset) {
+      tempCloudsYOffset = window.pageYOffset;
+      moveClouds('left');
+      return;
+    }
+
+    if (window.pageYOffset < tempCloudsYOffset) {
+      tempCloudsYOffset = window.pageYOffset;
+      moveClouds('right');
+      return;
+    }
+  }
+
+  function moveClouds(direction) {
+    if (cloudsScrollStatus) {
+      switch (direction) {
+        case 'left':
+          headerClouds.style.left = parseInt(headerClouds.style.left, 10) - CLOUDS_MOVE_DISTANCE + 'px';
+          //console.log('left -' + headerClouds.style.left);
+          break;
+        case 'right':
+          headerClouds.style.left = parseInt(headerClouds.style.left, 10) + CLOUDS_MOVE_DISTANCE + 'px';
+          //console.log('right -' + headerClouds.style.left);
+          break;
+      }
+    }
+  }
+
+  function isCloudsScrollEnabled() {
+    //Если блок .demo не виден, то облака не скролятся
+    if (gameBlock.getBoundingClientRect().bottom <= 0) {
+      cloudsScrollStatus = false;
+    } else {
+      cloudsScrollStatus = true;
+    }
+  }
+
+  function setGameState() {
+    if (cloudsScrollStatus === false) {
+      game.setGameStatus(window.Game.Verdict.PAUSE);
+    } else {
+      game.setGameStatus(window.Game.Verdict.CONTINUE);
+    }
+  }
+
 })();

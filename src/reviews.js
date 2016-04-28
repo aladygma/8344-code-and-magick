@@ -1,6 +1,6 @@
 'use strict';
 
-(function() {
+module.exports = function() {
   var FILTERS = {
     'ALL': 'reviews-all',
     'RECENT': 'reviews-recent',
@@ -189,5 +189,4 @@
   function isNextPageAvailable() {
     return currentFilteredReviews.length - (PAGE_SIZE * pageNumber) > 0;
   }
-
-})();
+};

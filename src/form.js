@@ -1,6 +1,6 @@
 'use strict';
 
-(function() {
+module.exports = function() {
   var browserCookies = require('browser-cookies');
   var MIN_MARK = 3;
   var isDisabled = false;
@@ -124,4 +124,4 @@
     evt.preventDefault();
     formContainer.classList.add('invisible');
   };
-})();
+};

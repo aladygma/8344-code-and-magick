@@ -1,6 +1,6 @@
 'use strict';
 
-(function() {
+module.exports = function() {
   /**
    * @const
    * @type {number}
@@ -847,4 +847,4 @@
     }
   }
 
-})();
+};

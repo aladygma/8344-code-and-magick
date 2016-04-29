@@ -17,7 +17,7 @@ module.exports = function() {
   var GOOD_RATING = 3;
   var PAGE_SIZE = 3;
   //Миллисекунд в 2 неделях
-  var RECENT_REVIEWS_TIME = 1000 * 3600 * 24;
+  var RECENT_REVIEWS_TIME = 1000 * 3600 * 24 * 14;
 
   var showMoreReviews = document.querySelector('.reviews-controls-more');
   var templateTag = document.querySelector('#review-template');

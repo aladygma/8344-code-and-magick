@@ -779,7 +779,7 @@ module.exports = function() {
 
     moveCloudsTimeout = setTimeout(function() {
       moveCloudsByScroll();
-    }, 20);
+    }, 15);
   });
 
   window.addEventListener('scroll', function() {
